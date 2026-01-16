@@ -2,6 +2,7 @@ import base64
 from django.shortcuts import render
 import requests
 
+from classifier import models
 from classifier.forms import ImageUploadForm
 from classifier.models import Prediction
 
@@ -35,3 +36,19 @@ def classify_image(request):
         form = ImageUploadForm()
 
     return render(request, "classify.html", {"form": form, "result": result})
+
+def stats(request):
+    predictions = Prediction.objects.all()
+    total = predictions.count()
+
+    if total > 0:
+        most_common = predictions.values('prediction').annotate(
+            count=models.Count('prediction')
+        ).order_by('-count')[0]['prediction']
+    else:
+        most_common = None
+
+    return render(request, "stats.html", {
+        "total": total,
+        "most_common": most_common
+    })
