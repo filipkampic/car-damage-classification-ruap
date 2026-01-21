@@ -56,10 +56,10 @@
                         
                         <h3 class="text-center mb-4">Upload Image</h3>
 
-                        <form method="POST", enctype="multipart/form-data">
+                        <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             {{ form.as_p }}
-                            <button type="submit" class="btn btn-primary w-100">Upload</button>
+                            <button id="submitBtn" type="submit" class="btn btn-primary w-100">Classify</button>
                         </form>
 
                         {% if result %}
@@ -77,5 +77,16 @@
     <footer class="bg-dark text-white text-center py-3">
         <small>Car Damage Classification • RUAP Project • {{ now|date:"Y" }}</small>
     </footer>
+
+    <script>
+        document.querySelector("form").addEventListener("submit", function () {
+            const btn = document.getElementById("submitBtn");
+            btn.disabled = true;
+            btn.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Classifying...
+            `;
+        });
+    </script>
 </body>
 </html>
