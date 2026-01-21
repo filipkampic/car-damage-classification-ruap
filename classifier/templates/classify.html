@@ -62,6 +62,8 @@
                             <button id="submitBtn" type="submit" class="btn btn-primary w-100">Classify</button>
                         </form>
 
+                        <img id="preview" src="#" alt="Image preview" class="img-fluid mt-3 d-none rounded shadow-sm">
+
                         {% if result %}
                             <div class="alert alert-info text-center mt-4">
                                 <strong>Prediction:</strong> {{ result }}
@@ -86,6 +88,19 @@
                 <span class="spinner-border spinner-border-sm me-2"></span>
                 Classifying...
             `;
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const fileInput = document.querySelector('input[type="file"]');
+            const preview = document.getElementById("preview");
+
+            fileInput.addEventListener("change", function () {
+                const file = this.files[0];
+                if (file) {
+                    preview.src = URL.createObjectURL(file);
+                    preview.classList.remove("d-none");
+                }
+            });
         });
     </script>
 </body>
