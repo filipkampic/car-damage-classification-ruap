@@ -1,6 +1,6 @@
-import base64
+from django.utils import timezone
+from datetime import timedelta
 from django.shortcuts import render
-import requests
 
 from classifier import models
 from classifier.forms import ImageUploadForm
@@ -11,6 +11,12 @@ from django.shortcuts import render
 from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
 from .ml_model import predict_from_image_path
+
+LABEL_MAP = {
+    "01-minor": "Minor",
+    "02-moderate": "Moderate",
+    "03-severe": "Severe"
+}
 
 def classify_image(request):
     result = None
@@ -39,18 +45,28 @@ def classify_image(request):
 
 def stats(request):
     predictions = Prediction.objects.all()
-    total = predictions.count()
 
-    if total > 0:
-        most_common = predictions.values('prediction').annotate(
+    if predictions.exists():
+        most_common_raw = predictions.values('prediction').annotate(
             count=Count('prediction')
         ).order_by('-count')[0]['prediction']
+        most_common = LABEL_MAP.get(most_common_raw, most_common_raw)
     else:
         most_common = None
 
+    last_24h = timezone.now() - timedelta(hours=24)
+    recent_count = predictions.filter(created_at__gte=last_24h).count()
+
+    raw_counts = predictions.values('prediction').annotate(count=Count('prediction'))
+    class_distribution = {
+        LABEL_MAP.get(item['prediction'], item['prediction']): item['count']
+        for item in raw_counts
+    }
+
     return render(request, "stats.html", {
-        "total": total,
-        "most_common": most_common
+        "most_common": most_common,
+        "recent_count": recent_count,
+        "class_distribution": class_distribution,
     })
 
 @require_POST

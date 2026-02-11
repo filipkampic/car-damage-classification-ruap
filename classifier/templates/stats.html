@@ -55,8 +55,16 @@
                         
                         <h3 class="text-center mb-4">Application Statistics</h3>
 
-                        <p><strong>Total predictions:</strong> {{ total }}</p>
                         <p><strong>Most common class:</strong> {{ most_common }}</p>
+
+                        <p><strong>Predictions in last 24 hours:</strong> {{ recent_count }}</p>
+
+                        <h5 class="mt-4">Class distribution:</h5>
+                        <ul>
+                            {% for label, count in class_distribution.items %}
+                                <li>{{ label }}: {{ count }}</li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
             </div>
