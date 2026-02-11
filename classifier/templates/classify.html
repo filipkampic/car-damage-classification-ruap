@@ -65,6 +65,7 @@
                         <img id="preview" src="#" alt="Image preview" class="img-fluid mt-3 d-none rounded shadow-sm">
 
                         {% if result %}
+                            <img src="{{ image_url }}" class="img-fluid mt-3 rounded shadow-sm">
                             <div class="alert alert-info text-center mt-4">
                                 <strong>Prediction:</strong> {{ result }}
                             </div>

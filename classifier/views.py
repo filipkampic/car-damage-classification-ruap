@@ -13,6 +13,7 @@ from .ml_model import predict_from_image_path
 
 def classify_image(request):
     result = None
+    image_url = None
 
     if request.method == "POST":
         form = ImageUploadForm(request.POST, request.FILES)
@@ -24,6 +25,8 @@ def classify_image(request):
 
             result = predict_from_image_path(absolute_path)
 
+            image_url = default_storage.url(file_path)
+
             Prediction.objects.create(
                 image=img,
                 prediction=result
@@ -31,7 +34,7 @@ def classify_image(request):
     else:
         form = ImageUploadForm()
 
-    return render(request, "classify.html", {"form": form, "result": result})
+    return render(request, "classify.html", {"form": form, "result": result, "image_url": image_url})
 
 def stats(request):
     predictions = Prediction.objects.all()
