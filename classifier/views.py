@@ -6,8 +6,10 @@ from classifier import models
 from classifier.forms import ImageUploadForm
 from classifier.models import Prediction
 
-AZURE_ENDPOINT = "<YOUR_ENDPOINT_URL>"
-AZURE_KEY = "<YOUR_ENDPOINT_KEY>"
+from django.shortcuts import render
+from django.views.decorators.http import require_POST
+from django.core.files.storage import default_storage
+from .ml_model import predict_from_image_path
 
 def classify_image(request):
     result = None
@@ -17,16 +19,10 @@ def classify_image(request):
         if form.is_valid():
             img = request.FILES['image']
 
-            b64 = base64.b64encode(img.read()).decode('utf-8')
+            file_path = default_storage.save("tmp/" + img.name, img)
+            absolute_path = default_storage.path(file_path)
 
-            payload = {"image_base64": b64}
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {AZURE_KEY}"
-            }
-
-            response = requests.post(AZURE_ENDPOINT, json=payload, headers=headers)
-            result = response.json().get("prediction", "error")
+            result = predict_from_image_path(absolute_path)
 
             Prediction.objects.create(
                 image=img,
@@ -52,3 +48,15 @@ def stats(request):
         "total": total,
         "most_common": most_common
     })
+
+@require_POST
+def predict_view(request):
+    image_file = request.FILES.get('image')
+    if not image_file:
+        return render(request, "index.html", {"error": "Nema slike."})
+
+    file_path = default_storage.save("tmp/" + image_file.name, image_file)
+
+    label = predict_from_image_path(file_path)
+
+    return render(request, "result.html", {"label": label})
