@@ -16,6 +16,9 @@
         footer {
             margin-top: auto;
         }
+        #fileInput {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -58,11 +61,21 @@
 
                         <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
-                            {{ form.as_p }}
+                            
+                            <div class="mb-3 text-center">
+                                <label for="fileInput"
+                                    class="btn btn-light px-4 py-2 border border-2 rounded-3"
+                                    style="border-style: dashed; font-weight: 600;">
+                                    📁 Choose Image
+                                </label>
+                                <input id="fileInput" type="file" name="image" accept="image/*" class="d-none">
+                            </div>
+                            
                             <button id="submitBtn" type="submit" class="btn btn-primary w-100">Classify</button>
                         </form>
 
                         <img id="preview" src="#" alt="Image preview" class="img-fluid mt-3 d-none rounded shadow-sm">
+                        <p id="fileName" class="text-muted small mt-2"></p>
 
                         {% if result %}
                             <img src="{{ image_url }}" class="img-fluid mt-3 rounded shadow-sm">
@@ -82,7 +95,15 @@
     </footer>
 
     <script>
-        document.querySelector("form").addEventListener("submit", function () {
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const fileInput = document.getElementById("fileInput");
+
+            if (!fileInput.files.length) {
+                e.preventDefault();
+                alert("Please select an image before classifying.");
+                return;
+            }
+
             const btn = document.getElementById("submitBtn");
             btn.disabled = true;
             btn.innerHTML = `
@@ -100,6 +121,8 @@
                 if (file) {
                     preview.src = URL.createObjectURL(file);
                     preview.classList.remove("d-none");
+
+                    document.getElementById("fileName").textContent = file.name;
                 }
             });
         });
