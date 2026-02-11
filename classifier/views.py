@@ -41,7 +41,14 @@ def classify_image(request):
     else:
         form = ImageUploadForm()
 
-    return render(request, "classify.html", {"form": form, "result": result, "image_url": image_url})
+    readable_result = LABEL_MAP.get(result, result)
+
+    return render(request, "classify.html", {
+        "form": form,
+        "result": readable_result,
+        "image_url": image_url
+    })
+
 
 def stats(request):
     predictions = Prediction.objects.all()
