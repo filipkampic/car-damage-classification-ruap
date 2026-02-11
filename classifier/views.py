@@ -6,6 +6,7 @@ from classifier import models
 from classifier.forms import ImageUploadForm
 from classifier.models import Prediction
 
+from django.db.models import Count
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
@@ -42,7 +43,7 @@ def stats(request):
 
     if total > 0:
         most_common = predictions.values('prediction').annotate(
-            count=models.Count('prediction')
+            count=Count('prediction')
         ).order_by('-count')[0]['prediction']
     else:
         most_common = None
