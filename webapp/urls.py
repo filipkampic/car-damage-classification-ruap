@@ -22,7 +22,7 @@ from classifier.views import classify_image, stats
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', classify_image, name='classify'),
+    path('classify/', classify_image, name='classify'),
     path('stats/', stats, name='stats'),
 ]
 
