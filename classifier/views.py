@@ -19,6 +19,9 @@ LABEL_MAP = {
     "03-severe": "Severe"
 }
 
+def home(request):
+    return render(request, "classify.html")
+
 @csrf_exempt
 def classify_image(request):
     result = None
